@@ -1,0 +1,44 @@
+
+POST http://localhost:5000/user/register
+Content-Type: application/json 
+
+{
+  "username": "davyla",
+  "email": "davyla1233@gmail.com",
+  "password": "55555"
+}
+###
+POST http://localhost:5000/posts
+Content-Type: application/json 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MDQzZGY3ZWRhNjUzNGQyYjg2OTI4NCIsImlhdCI6MTcyODMzMTI4NiwiZXhwIjoxNzI4MzM0ODg2fQ.5ke2J8RRKgJ3qlwVgnOY-9FjoKKibJ1hPA_vK4yt4lg
+
+{
+  "imageUrl": "https://res.cloudinary.com/dkhosxear/image/upload/v1726973999/cld-sample-5.jpg"
+}
+###
+GET http://localhost:5000/posts
+###
+
+
+
+
+###
+GET http://localhost:5000/user
+
+###
+
+POST http://localhost:5000/auth/login
+Content-Type: application/json 
+
+{
+   "email": "davyla1233@gmail.com",
+  "password": "55555"
+
+}
+
+
+
+
+
+
+
