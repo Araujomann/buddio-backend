@@ -23,6 +23,6 @@ export async function verifyJWT(req, reply) {
 
        req.user = decoded;
     } catch (error) {
-        reply.code(401).send({error: "Token inválido ou expirado"})
+        reply.code(401).send({error: error.message})
     }
 }

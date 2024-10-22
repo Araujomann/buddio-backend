@@ -8,9 +8,9 @@ Content-Type: application/json
   "password": "55555"
 }
 ###
-POST http://localhost:5000/posts
+POST http://localhost:5000/posts/upload
 Content-Type: application/json 
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MDQzZGY3ZWRhNjUzNGQyYjg2OTI4NCIsImlhdCI6MTcyODMzMTI4NiwiZXhwIjoxNzI4MzM0ODg2fQ.5ke2J8RRKgJ3qlwVgnOY-9FjoKKibJ1hPA_vK4yt4lg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MDQzZGY3ZWRhNjUzNGQyYjg2OTI4NCIsImlhdCI6MTcyOTIwMjA5NiwiZXhwIjoxNzI5MjA1Njk2fQ.LlD8PLKTls8i3E9LZ23Bss4GnJkmwsSLUBWXxu1ip3o
 
 {
   "imageUrl": "https://res.cloudinary.com/dkhosxear/image/upload/v1726973999/cld-sample-5.jpg"

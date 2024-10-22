@@ -3,23 +3,28 @@ import cors from '@fastify/cors';
 import{ connectDB } from './db.js';
 import {postRoutes}  from './routes/postRoutes.js';
 import {registerRoutes} from './routes/registerRoutes.js';
-import { loginRoutes } from './routes/loginRoutes.js';
+import { authRoutes } from './routes/authRoutes.js';
+import { feedRoutes } from './routes/feedRoutes.js';
+import fastifyMultipart from '@fastify/multipart'; 
 
 const fastify = Fastify({ logger: true }); 
+
 
 fastify.register(cors, { 
   origin: '*' 
 });
 
-
 connectDB();
 
-// Registrar rotas
+fastify.register(fastifyMultipart);
+
+
 fastify.register(postRoutes, { prefix: "/posts" });
 fastify.register(registerRoutes, { prefix: "/user"})
-fastify.register(loginRoutes, { prefix: "/auth"});
+fastify.register(authRoutes, { prefix: "/auth"});
+fastify.register(feedRoutes, { prefix: "/feed"});
 
-// Iniciar o servidor
+
 const start = async () => {
   try {
     await fastify.listen({ port: 5000 });
