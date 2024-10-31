@@ -20,7 +20,7 @@ export async function authRoutes(fastify, options) {
 
             const isValid = await bcrypt.compare(password, user.password);
             if (!isValid) {
-                return reply.code(400).send({ error: "Senha incorreta" });
+                return reply.code(401).send({ error: "Senha incorreta" });
             }
 
             const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {

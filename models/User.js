@@ -21,7 +21,15 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-});
+    bio: {
+        type: String,
+        default: "",
+    },
+    profileImage: {
+        type: String,
+        default: "",
+    },
+}, {strict: true});
 
 userSchema.pre("save", async function (next) {
     // Só hashear se a senha foi modificada ou criada

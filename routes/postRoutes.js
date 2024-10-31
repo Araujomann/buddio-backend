@@ -30,6 +30,9 @@ export async function postRoutes(fastify, options) {
     });
 
 
+    
+
+
     fastify.post('/upload', {preHandler:[verifyJWT]}, async (req, reply) => {
         try {
 

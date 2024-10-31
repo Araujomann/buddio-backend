@@ -5,6 +5,9 @@ import {postRoutes}  from './routes/postRoutes.js';
 import {registerRoutes} from './routes/registerRoutes.js';
 import { authRoutes } from './routes/authRoutes.js';
 import { feedRoutes } from './routes/feedRoutes.js';
+import { profileRoutes } from './routes/profileRoutes.js';
+import { searchRoutes } from './routes/searchRoutes.js';
+import { followRoutes } from './routes/followRoutes.js';
 import fastifyMultipart from '@fastify/multipart'; 
 
 const fastify = Fastify({ logger: true }); 
@@ -21,8 +24,11 @@ fastify.register(fastifyMultipart);
 
 fastify.register(postRoutes, { prefix: "/posts" });
 fastify.register(registerRoutes, { prefix: "/user"})
+fastify.register(profileRoutes, { prefix: "/profile"});
 fastify.register(authRoutes, { prefix: "/auth"});
 fastify.register(feedRoutes, { prefix: "/feed"});
+fastify.register(searchRoutes, { prefix: "/search"});
+fastify.register(followRoutes)
 
 
 const start = async () => {
