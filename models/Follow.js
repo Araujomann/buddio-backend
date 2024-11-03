@@ -6,7 +6,7 @@ const followSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    followingId: {
+    followedId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -14,7 +14,7 @@ const followSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 followSchema.index({followerId: 1})
-followSchema.index({followingId: 1})
+followSchema.index({followedId: 1})
 
 
 export const Follow = mongoose.model("Follow", followSchema)
