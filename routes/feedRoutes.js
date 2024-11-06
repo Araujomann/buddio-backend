@@ -6,7 +6,6 @@ export async function feedRoutes (fastify, options) {
             const posts = await Post.find().populate("user", "username").sort({createdAt: -1})
             return reply.send(posts)
 
-
         } catch (error) {
             console.log(error)
             reply.code(500).send({error})

@@ -19,7 +19,7 @@ export async function searchRoutes(fastify, options) {
 
     fastify.get("/profile/:userId", { preHandler: [verifyJWT] }, async (req, reply) => {
         try {
-            const userId = req.params.userId;
+            const { userId } = req.params
 
             const user = await User.findById(userId).select("-password");
             if (!user) {

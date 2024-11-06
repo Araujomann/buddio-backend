@@ -1,5 +1,4 @@
 import { verifyJWT } from "../middlewares/auth.js";
-import fastifyMultipart from "fastify-multipart";
 import { cloudinary } from "../cloudinary.js";
 import { Post } from "../models/Post.js";
 import { User } from "../models/User.js";
@@ -8,7 +7,6 @@ export async function profileRoutes(fastify, options) {
     fastify.get("/:userId", { preHandler: [verifyJWT] }, async (req, reply) => {
         try {
             const userId = req.params.userId;
-            console.log(req);
             const user = await User.findById(userId).select("-password");
             if (!user) {
                 return reply
@@ -61,10 +59,6 @@ export async function profileRoutes(fastify, options) {
                 });
                 reply.send({
                     message: "Upload realizado com sucesso",
-                    url: result.secure_url,
-                });
-
-                reply.send({
                     message: "Imagem de perfil atualizada!",
                     url: result.secure_url,
                 });

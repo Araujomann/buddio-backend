@@ -7,17 +7,15 @@ export async function followRoutes(fastify, options) {
         { preHandler: [verifyJWT] },
         async (req, reply) => {
             try {
-                console.log("parametros da requisicao: ", req.params);
 
                 const followedId = req.params.id;
                 const followerId = req.user.id;
 
-                console.log(followedId,"`>>", followerId);
-
                 const existingFollow = await Follow.findOne({
                     followerId,
                     followedId,
-                });
+                }); 
+
                 if (existingFollow) {
                     return reply
                         .status(400)
@@ -29,13 +27,11 @@ export async function followRoutes(fastify, options) {
                 const follow = new Follow({ followerId, followedId });
                 await follow.save();
 
-                return reply.send({ message: "Usuário seguido com sucesso." });
+                return reply.send({ message: "Seguindo usuário." });
             } catch (error) {
                 console.error("Erro ao seguir usuário: ", error);
             }
         }
-
-        
     );
 
     fastify.delete(
@@ -43,13 +39,14 @@ export async function followRoutes(fastify, options) {
         { preHandler: [verifyJWT] },
         async (req, reply) => {
             try {
-                const { followedId } = req.params.id;
-                const followerId = req.user._id;
+                const followedId  = req.params.id;
+                const followerId = req.user.id;
 
                 const deletedFollow = await Follow.findOneAndDelete({
                     followerId,
                     followedId,
                 });
+
                 if (!deletedFollow) {
                     return reply
                         .status(404)
@@ -71,7 +68,7 @@ export async function followRoutes(fastify, options) {
         { preHandler: [verifyJWT] },
         async (req, reply) => {
             try {
-                const { userId } = req.params;
+                const  userId  = req.user.id;
 
                 const followers = await Follow.find({
                     followedId: userId,
@@ -95,6 +92,21 @@ export async function followRoutes(fastify, options) {
         } catch (error) {
             console.error("Erro ao verificar se está seguindo: ", error)
             reply.status(500).send({ message: error.message })
+        }
+    })
+
+    fastify.get("/user/following", { preHandler: [verifyJWT] }, async (req, reply) => {
+        try {
+            const followerId = req.user.id
+            const following = await Follow.find({ followerId }).select("followedId")
+
+            const followedIds = following.map(follow => follow.followedId.toString())
+
+            reply.send(followedIds)
+        
+        } catch (error) {
+            console.error("Erro ao buscar seguidores: ", error)
+            reply.status(500).send({ message: error.message})
         }
     })
 }
