@@ -8,7 +8,6 @@ import { feedRoutes } from "./routes/feedRoutes.js";
 import { profileRoutes } from "./routes/profileRoutes.js";
 import { searchRoutes } from "./routes/searchRoutes.js";
 import { followRoutes } from "./routes/followRoutes.js";
-import { likeRoutes } from "./routes/likeRoutes.js";
 import fastifyMultipart from "@fastify/multipart";
 
 const fastify = Fastify({ logger: true });
@@ -28,7 +27,6 @@ fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(feedRoutes, { prefix: "/feed" });
 fastify.register(searchRoutes, { prefix: "/search" });
 fastify.register(followRoutes);
-fastify.register(likeRoutes);
 
 const start = async () => {
     try {

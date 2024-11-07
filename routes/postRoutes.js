@@ -93,8 +93,6 @@ export async function postRoutes(fastify, options) {
             const userId = req.user.id;
 
             try {
-                
-
                 const post = await Post.findById(postId);
                 if (!post) {
                     return reply
@@ -119,6 +117,23 @@ export async function postRoutes(fastify, options) {
             } catch (error) {
                 console.error("Erro no servidor: ", error);
                 reply.code(500).send({ error: "Erro ao curtir a postagem" });
+            }
+        }
+    );
+
+    fastify.get(
+        "/:userId/liked-posts",
+        { preHandler: [verifyJWT] },
+        async (req, reply) => {
+            const { userId } = req.params
+            try {
+                const likedPosts = await Post.find({ likes: userId }).sort({
+                    createdAt: -1
+                });
+                return reply.send(likedPosts);
+            } catch (error) {
+                console.error("Erro eu buscar posts curtidos: ", error);
+                reply.status(500).send({ message: error.mensage });
             }
         }
     );
