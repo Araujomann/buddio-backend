@@ -17,6 +17,11 @@ export async function authRoutes(fastify, options) {
                     .send({ error: "Usuário não encontrado" });
             }
 
+            if(!user.verifiedEmail) {
+                return reply.code(400).send({ error: "Email não verificado. Verifique seu email." });
+            }
+
+
             const isValid = await bcrypt.compare(password, user.password);
             if (!isValid) {
                 return reply.code(401).send({ error: "Senha incorreta" });

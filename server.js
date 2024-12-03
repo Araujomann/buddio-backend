@@ -13,19 +13,19 @@ import fastifyMultipart from "@fastify/multipart";
 const fastify = Fastify({ logger: true });
 
 fastify.register(cors, {
-    origin: "*",
+    origin: "*"
 });
 
 connectDB();
 
 fastify.register(fastifyMultipart);
 
-fastify.register(postRoutes, { prefix: "/posts" });
-fastify.register(registerRoutes, { prefix: "/user" });
-fastify.register(profileRoutes, { prefix: "/profile" });
-fastify.register(authRoutes, { prefix: "/auth" });
-fastify.register(feedRoutes, { prefix: "/feed" });
-fastify.register(searchRoutes, { prefix: "/search" });
+fastify.register(postRoutes, { prefix: "/posts" }); //------
+fastify.register(registerRoutes, { prefix: "/user" }); //------
+fastify.register(profileRoutes, { prefix: "/profile" }); // ------
+fastify.register(authRoutes, { prefix: "/auth" }); //------
+fastify.register(feedRoutes, { prefix: "/feed" }); //------
+fastify.register(searchRoutes, { prefix: "/search" });  // ------
 fastify.register(followRoutes);
 
 const start = async () => {

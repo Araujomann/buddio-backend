@@ -20,8 +20,11 @@
     "dotenv": "^16.4.5",
     "fastify": "^5.0.0",
     "fastify-multipart": "^5.4.0",
+    "firebase": "^10.14.1",
+    "firebaseui": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.3",
+    "nodemailer": "^6.9.16",
     "postgres": "^3.4.4"
   }
 }

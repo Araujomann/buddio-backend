@@ -13,9 +13,18 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    verifiedEmail: {
+        type: Boolean,
+        default: false
+    },
+    confirmationCode: {
+        type: String,
+    },
     password: {
         type: String,
-        required: true,
+        required: function(){
+            return this.authProvider !== "google"
+        }
     },
     createdAt: {
         type: Date,

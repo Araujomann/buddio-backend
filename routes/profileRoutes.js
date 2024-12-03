@@ -57,28 +57,13 @@ export async function profileRoutes(fastify, options) {
                 await User.findByIdAndUpdate(userId, {
                     profileImage: result.secure_url,
                 });
+                
                 reply.send({
                     message: "Upload realizado com sucesso",
                     message: "Imagem de perfil atualizada!",
                     url: result.secure_url,
                 });
 
-                const imageUrl = result.secure_url;
-                const decodedUser = req.user;
-
-                if (!decodedUser || !decodedUser.id) {
-                    return reply
-                        .code(400)
-                        .send({ error: "Usuário não encontrado no token" });
-                }
-
-                const updatedUser = await User.findByIdAndUpdate(
-                    decodedUser.id,
-                    { profileImage: imageUrl }
-                );
-                const saved = await updatedUser.save();
-                console.log("Usuário atualizado: ", saved);
-                reply.code(201).send(updatedUser);
             } catch (error) {
                 console.log("Erro no servidor: ", error);
                 reply.code(500).send({

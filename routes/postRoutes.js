@@ -18,7 +18,7 @@ export async function postRoutes(fastify, options) {
             const newPost = new Post({ imageUrl, user: decodedUser.id });
             const saved = await newPost.save();
 
-            reply.code(201).send(newPost);
+            reply.code(201).send(saved);
         } catch (error) {
             console.error("Erro no servidor: ", error);
             reply
@@ -85,7 +85,8 @@ export async function postRoutes(fastify, options) {
         }
     });
 
-    fastify.put(
+    fastify.put(   
+        // ESSA ROTA AINDA NÃO ESTÁ SENDO UTILIZADA DENTRO DA APLICAÇÃO, É A QUE VAI FAZER O NÚMERO DE CURTIDAS SE ALTERAR PARA O DONO DO POST
         "/:postId/like",
         { preHandler: [verifyJWT] },
         async (req, reply) => {
@@ -125,11 +126,9 @@ export async function postRoutes(fastify, options) {
         "/:userId/liked-posts",
         { preHandler: [verifyJWT] },
         async (req, reply) => {
-            const { userId } = req.params
+            const { userId } = req.params;
             try {
-                const likedPosts = await Post.find({ likes: userId }).sort({
-                    createdAt: -1
-                });
+                const likedPosts = await Post.find({ likes: userId });
                 return reply.send(likedPosts);
             } catch (error) {
                 console.error("Erro eu buscar posts curtidos: ", error);

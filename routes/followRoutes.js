@@ -27,7 +27,7 @@ export async function followRoutes(fastify, options) {
                 const follow = new Follow({ followerId, followedId });
                 await follow.save();
 
-                return reply.send({ message: "Seguindo usuário." });
+                return reply.send({ message: "Seguindo usuário.", isFollowing: true });
             } catch (error) {
                 console.error("Erro ao seguir usuário: ", error);
             }
@@ -35,7 +35,7 @@ export async function followRoutes(fastify, options) {
     );
 
     fastify.delete(
-        "/unfollow",
+        "/unfollow/:id",
         { preHandler: [verifyJWT] },
         async (req, reply) => {
             try {
@@ -55,7 +55,7 @@ export async function followRoutes(fastify, options) {
                         });
                 }
 
-                return reply.send({ message: "Deixou de seguir o usuário." });
+                return reply.send({ message: "Deixou de seguir o usuário.", isFollowing: false });
             } catch (error) {
                 console.error("Erro ao deixar de seguir usuário: ", error);
                 return reply.status(500).send({ message: error.message });
@@ -64,7 +64,7 @@ export async function followRoutes(fastify, options) {
     );
 
     fastify.get(
-        "/followers/:userId",
+        "/followers",
         { preHandler: [verifyJWT] },
         async (req, reply) => {
             try {
