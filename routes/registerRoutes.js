@@ -4,17 +4,22 @@ import crypto from "crypto";
 
 export async function registerRoutes(fastify, options) {
     fastify.post("/register", async (req, reply) => {
-
         const { username, email, password, authProvider } = req.body;
         let verifiedEmail = false;
-        
+
         try {
             const existingUser = await User.findOne({ username });
-
+            const existingEmail = await User.findOne({ email });
             if (existingUser) {
                 return reply
                     .code(409)
-                    .send({ Error: "Este usuário já existe." });
+                    .send({ Error: "Este nome de usuário já existe." });
+            }
+
+            if (existingEmail) {
+                return reply
+                    .code(409)
+                    .send({ Error: "Este email já está em uso." });
             }
 
             if (authProvider === "google") {
@@ -29,6 +34,7 @@ export async function registerRoutes(fastify, options) {
                 password,
                 confirmationCode,
                 verifiedEmail,
+                authProvider,
             });
             await newUser.save();
 
@@ -61,11 +67,15 @@ export async function registerRoutes(fastify, options) {
                     console.log("Email enviado: " + info.response);
                 });
 
-                reply.send({
+                reply.code(200).send({
                     message:
                         "Registro bem-sucedido! Verifique seu email para confirmar a conta.",
                 });
             }
+            reply.code(200).send({
+                message:
+                    "Registro bem-sucedido! Email confirmado automaticamente.",
+            });
         } catch (error) {
             if (error.code === 11000) {
                 console.log(error);

@@ -15,7 +15,6 @@ export async function verifyJWT(req, reply) {
        }
 
        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-       console.log("decoded: ", decoded)
        if(!decoded.id){
         reply.code(400).send({error: "Usuário não encontrado no token"})
         return;
