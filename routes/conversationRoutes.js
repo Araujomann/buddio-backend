@@ -16,10 +16,15 @@ export async function conversationRoutes(fastify, options) {
             if (!conversation) {
                 conversation = new Conversation({
                     participants: [senderId, receiverId],
+                    startedAt: Date.now(),
                 });
+
+                
                 await conversation.save();
+
+
             }
-            reply.send({ conversationId: conversation._id });
+            reply.send({ conversationId: conversation._id, startedAt: conversation.startedAt });
         } catch (error) {
             reply.code(500).send({ error: error.message });
         }
@@ -39,11 +44,18 @@ export async function conversationRoutes(fastify, options) {
             await newMessage.save();
 
             const conversation = await Conversation.findById(conversationId);
+
             if (!conversation) {
                 return reply
                     .code(404)
                     .send({ error: "Conversation not found" });
             }
+
+            if(!conversation.startedAt){
+                conversation.startedAt = Date.now();
+                await conversation.save();
+            }
+
 
             const participants = conversation.participants;
 

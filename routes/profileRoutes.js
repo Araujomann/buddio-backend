@@ -6,7 +6,7 @@ import { User } from "../models/User.js";
 export async function profileRoutes(fastify, options) {
     fastify.get("/:userId", { preHandler: [verifyJWT] }, async (req, reply) => {
         try {
-            const userId = req.params.userId;
+            const { userId } = req.params;
             const user = await User.findById(userId).select("-password");
             if (!user) {
                 return reply
