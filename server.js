@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { Message } from "./models/Message.js";
 import { connectDB } from "./db.js";
 import { postRoutes } from "./routes/postRoutes.js";
-import { registerRoutes } from "./routes/registerRoutes.js";
+import { userRoutes } from "./routes/userRoutes.js";
 import { authRoutes } from "./routes/authRoutes.js";
 import { feedRoutes } from "./routes/feedRoutes.js";
 import { profileRoutes } from "./routes/profileRoutes.js";
@@ -27,7 +27,7 @@ connectDB();
 
 fastify.register(fastifyMultipart);
 fastify.register(postRoutes, { prefix: "/posts" });
-fastify.register(registerRoutes, { prefix: "/user" });
+fastify.register(userRoutes, { prefix: "/user" });
 fastify.register(profileRoutes, { prefix: "/profile" });
 fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(feedRoutes, { prefix: "/feed" });

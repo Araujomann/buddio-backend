@@ -4,31 +4,36 @@ import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 
 export async function conversationRoutes(fastify, options) {
-    fastify.post("/:receiverId",{preHandler : [verifyJWT]}, async (req, reply) => {
-        const  senderId  = req.user.id;
-        const receiverId = req.params.receiverId;
+    fastify.post(
+        "/:receiverId",
+        { preHandler: [verifyJWT] },
+        async (req, reply) => {
+            const senderId = req.user.id;
+            const receiverId = req.params.receiverId;
 
-        try {
-            let conversation = await Conversation.findOne({
-                participants: { $all: [senderId, receiverId] },
-            });
-
-            if (!conversation) {
-                conversation = new Conversation({
-                    participants: [senderId, receiverId],
-                    startedAt: Date.now(),
+            try {
+                let conversation = await Conversation.findOne({
+                    participants: { $all: [senderId, receiverId] },
                 });
 
-                
-                await conversation.save();
+                if (!conversation) {
+                    conversation = new Conversation({
+                        participants: [senderId, receiverId],
+                        startedAt: Date.now(),
+                    });
 
-
+                    await conversation.save();
+                }
+                reply.send({
+                    conversationId: conversation._id,
+                    startedAt: conversation.startedAt,
+                });
+            } catch (error) {
+                reply.code(500).send({ error: error.message });
+                console.log(error.message);
             }
-            reply.send({ conversationId: conversation._id, startedAt: conversation.startedAt });
-        } catch (error) {
-            reply.code(500).send({ error: error.message });
         }
-    });
+    );
 
     fastify.post("/messages", async (req, reply) => {
         const { conversationId, senderId, message } = req.body;
@@ -38,7 +43,7 @@ export async function conversationRoutes(fastify, options) {
                 conversationId,
                 senderId,
                 message,
-                timestamp
+                timestamp,
             });
 
             await newMessage.save();
@@ -51,11 +56,10 @@ export async function conversationRoutes(fastify, options) {
                     .send({ error: "Conversation not found" });
             }
 
-            if(!conversation.startedAt){
+            if (!conversation.startedAt) {
                 conversation.startedAt = Date.now();
                 await conversation.save();
             }
-
 
             const participants = conversation.participants;
 
@@ -75,12 +79,12 @@ export async function conversationRoutes(fastify, options) {
             reply.send({ messageId: newMessage._id });
         } catch (error) {
             reply.code(500).send({ error: error.message });
+            console.log(error.message);
         }
     });
 
     fastify.get("/messages/:conversationId", async (req, reply) => {
         const { conversationId } = req.params;
-        
 
         try {
             const messages = await Message.find({ conversationId }).sort({
@@ -89,6 +93,57 @@ export async function conversationRoutes(fastify, options) {
             reply.send(messages);
         } catch (err) {
             reply.code(500).send({ error: err.message });
+        }
+    });
+
+    fastify.get("/:conversationId/preferences", async (req, reply) => {
+        const { conversationId } = req.params;
+
+        try {
+            const preferences = await Conversation.findById(
+                conversationId,
+                "chatBackground"
+            );
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA:   ", preferences);
+            reply.send(preferences);
+        } catch (error) {
+            reply.code(500).send({ error: error.message });
+        }
+    });
+
+    fastify.put("/:conversationId/chat-background", async (req, reply) => {
+        try {
+            const { conversationId } = req.params;
+            const { chatBackground } = req.body;
+
+            if (!chatBackground) {
+                return reply
+                    .code(400)
+                    .send({ message: "Nenhum fundo foi fornecido." });
+            }
+
+            const updatedConversation = await Conversation.findByIdAndUpdate(
+                conversationId,
+                { chatBackground },
+                { new: true }
+            );
+
+            if (!updatedConversation) {
+                return reply
+                    .status(404)
+                    .send({ message: "Conversa não encontrada." });
+            }
+
+            reply
+                .status(200)
+                .send({
+                    message: "Fundo da conversa atualizado com sucesso.",
+                    chatBackground: updatedConversation.chatBackground,
+                });
+        } catch (error) {
+            reply
+                .status(500)
+                .send({ message: "Erro ao atualizar o fundo.", error });
         }
     });
 }

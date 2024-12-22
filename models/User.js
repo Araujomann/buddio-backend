@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    chatBackground: {
+        type: String,
+        default: "",
+    }
 }, {strict: true});
 
 userSchema.pre("save", async function (next) {

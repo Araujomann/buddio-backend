@@ -1,8 +1,9 @@
 import { User } from "../models/User.js";
+import { verifyJWT } from "../middlewares/auth.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
-export async function registerRoutes(fastify, options) {
+export async function userRoutes(fastify, options) {
     fastify.post("/register", async (req, reply) => {
         const { username, email, password, authProvider } = req.body;
         let verifiedEmail = false;
@@ -172,4 +173,6 @@ export async function registerRoutes(fastify, options) {
             console.log("Erro no servidor: ", error);
         }
     });
+
+   
 }
