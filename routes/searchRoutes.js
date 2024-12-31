@@ -10,9 +10,28 @@ export async function searchRoutes(fastify, options) {
             const users = await User.find({
                 username: { $regex: query, $options: "i" },
             }).select("username profileImage");
-            reply.send(users);
+
+            const usersWithPosts = await Promise.all(
+                users.map(async (user) => {
+                    const twoPosts = await Post.find({
+                        user: user._id
+                    })
+                    .sort({createdAt: -1})
+                    .limit(2)
+
+                    return {
+                        ...user.toObject(),
+                        posts: twoPosts
+                    }
+                })
+            )
+
+                    console.log(usersWithPosts)
+            return reply.send(usersWithPosts)
+        
         } catch (error) {
             reply.status(500).send({ error: error.message });
+            console.log(error.message);
         }
     });
 

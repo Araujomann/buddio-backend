@@ -104,7 +104,6 @@ export async function conversationRoutes(fastify, options) {
                 conversationId,
                 "chatBackground"
             );
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA:   ", preferences);
             reply.send(preferences);
         } catch (error) {
             reply.code(500).send({ error: error.message });

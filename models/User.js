@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
     },
     profileImage: {
         type: String,
-        default: "",
+        default: "https://res.cloudinary.com/dkhosxear/image/upload/v1735048989/Captura_de_tela_2024-12-24_105753_ltu7jz.png",
     },
     chatBackground: {
         type: String,
