@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { verifyJWT } from "../middlewares/auth.js";
 import { cloudinary } from "../cloudinary.js";
+import fastifyMultipart from "fastify-multipart";
 
 export async function postRoutes(fastify, options) {
     fastify.post("/", { preHandler: [verifyJWT] }, async (req, reply) => {
@@ -84,6 +85,8 @@ export async function postRoutes(fastify, options) {
             reply.code(500).send({ error: "Erro ao buscar as postagens" });
         }
     });
+
+
 
     fastify.put(   
         // ESSA ROTA AINDA NÃO ESTÁ SENDO UTILIZADA DENTRO DA APLICAÇÃO, É A QUE VAI FAZER O NÚMERO DE CURTIDAS SE ALTERAR PARA O DONO DO POST
