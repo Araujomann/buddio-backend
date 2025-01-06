@@ -4,6 +4,22 @@ import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 
 export async function conversationRoutes(fastify, options) {
+    fastify.get("/", { preHandler: [verifyJWT] }, async (req, reply) => {
+        const userId = req.user.id;
+
+        try {
+            let conversations = await Conversation.find({
+                participants: userId,
+            })
+                .populate("participants", "profileImage username")
+                .sort({"lastMessage.timestamp": -1 });
+            return reply.send(conversations);
+        } catch (error) {
+            reply.code(500).send({ error: error.message });
+            console.log(error.message);
+        }
+    });
+
     fastify.post(
         "/:receiverId",
         { preHandler: [verifyJWT] },
