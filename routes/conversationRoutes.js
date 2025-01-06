@@ -13,6 +13,7 @@ export async function conversationRoutes(fastify, options) {
             })
                 .populate("participants", "profileImage username")
                 .sort({"lastMessage.timestamp": -1 });
+                console.log(conversations)
             return reply.send(conversations);
         } catch (error) {
             reply.code(500).send({ error: error.message });
@@ -51,53 +52,79 @@ export async function conversationRoutes(fastify, options) {
         }
     );
 
-    fastify.post("/messages", async (req, reply) => {
-        const { conversationId, senderId, message } = req.body;
 
-        try {
-            const newMessage = new Message({
-                conversationId,
-                senderId,
-                message,
-                timestamp,
-            });
-
-            await newMessage.save();
-
-            const conversation = await Conversation.findById(conversationId);
-
-            if (!conversation) {
-                return reply
-                    .code(404)
-                    .send({ error: "Conversation not found" });
-            }
-
-            if (!conversation.startedAt) {
-                conversation.startedAt = Date.now();
-                await conversation.save();
-            }
-
-            const participants = conversation.participants;
-
-            participants.forEach((participantId) => {
-                const clientSocket = clients.get(participantId);
-                if (clientSocket) {
-                    clientSocket.send(
-                        JSON.stringify({
-                            conversationId,
-                            senderId,
-                            message: newMessage.message,
-                        })
-                    );
+    fastify.post("/lastMessage", async (req, reply) => {
+            const { conversationId, message } = req.body;
+            try {
+                const conversation = await Conversation.findById(conversationId);
+                if (!conversation) {
+                    return reply
+                        .code(404)
+                        .send({ error: "Conversa não encontrada" });
                 }
-            });
+                conversation.lastMessage = {
+                    text: message,
+                    timestamp: Date.now(),
+                };
+                await conversation.save();
+                reply.send({ message: "Última mensagem atualizada com sucesso." });
+            } catch (error) {
+                reply.code(500).send({ error: error.message });
+            }
+    })
 
-            reply.send({ messageId: newMessage._id });
-        } catch (error) {
-            reply.code(500).send({ error: error.message });
-            console.log(error.message);
-        }
-    });
+    // // fastify.post("/messages", async (req, reply) => {
+    // //     const { conversationId, senderId, message } = req.body;
+
+    // //     try {
+    // //         const newMessage = new Message({
+    // //             conversationId,
+    // //             senderId,
+    // //             message,
+    // //             timestamp: Date.now(),
+    // //         });
+    // //         await newMessage.save();
+
+    // //         const conversation = await Conversation.findById(conversationId);
+    // //         if (!conversation) {
+    // //             return reply
+    // //                 .code(404)
+    // //                 .send({ error: "Conversation not found" });
+    // //         }
+
+    // //         conversation.lastMessage = {
+    // //             text: message,
+    // //             timestamp: newMessage.timestamp,
+    // //         }
+            
+    // //         if (!conversation.startedAt) {
+    // //             conversation.startedAt = Date.now();
+    // //         }
+
+
+    // //         await conversation.save();
+
+    // //         const participants = conversation.participants;
+
+    // //         participants.forEach((participantId) => {
+    // //             const clientSocket = clients.get(participantId);
+    // //             if (clientSocket) {
+    // //                 clientSocket.send(
+    // //                     JSON.stringify({
+    // //                         conversationId,
+    // //                         senderId,
+    // //                         message: newMessage.message,
+    // //                     })
+    // //                 );
+    // //             }
+    // //         });
+
+    // //         reply.send({ messageId: newMessage._id });
+    // //     } catch (error) {
+    // //         reply.code(500).send({ error: error.message });
+    // //         console.log(error.message);
+    // //     }
+    // // });
 
     fastify.get("/messages/:conversationId", async (req, reply) => {
         const { conversationId } = req.params;
@@ -149,12 +176,10 @@ export async function conversationRoutes(fastify, options) {
                     .send({ message: "Conversa não encontrada." });
             }
 
-            reply
-                .status(200)
-                .send({
-                    message: "Fundo da conversa atualizado com sucesso.",
-                    chatBackground: updatedConversation.chatBackground,
-                });
+            reply.status(200).send({
+                message: "Fundo da conversa atualizado com sucesso.",
+                chatBackground: updatedConversation.chatBackground,
+            });
         } catch (error) {
             reply
                 .status(500)
