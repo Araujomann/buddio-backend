@@ -25,7 +25,12 @@ fastify.register(cors, {
 
 connectDB();
 
-fastify.register(fastifyMultipart);
+fastify.register(fastifyMultipart, {
+    limits: {
+        fileSize: 10 * 1024 * 1024,
+    }
+});
+
 fastify.register(postRoutes, { prefix: "/posts" });
 fastify.register(userRoutes, { prefix: "/user" });
 fastify.register(profileRoutes, { prefix: "/profile" });

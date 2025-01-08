@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
 import { Post } from "../models/Post.js";
 import { verifyJWT } from "../middlewares/auth.js";
 import { cloudinary } from "../cloudinary.js";
-import fastifyMultipart from "fastify-multipart";
+import { Readable } from 'stream';
+import sharp from "sharp";
 
 export async function postRoutes(fastify, options) {
     fastify.post("/", { preHandler: [verifyJWT] }, async (req, reply) => {
@@ -28,9 +28,11 @@ export async function postRoutes(fastify, options) {
         }
     });
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 5MB
     fastify.post("/upload", { preHandler: [verifyJWT] }, async (req, reply) => {
         try {
             const file = await req.file();
+            
 
             if (!file) {
                 return reply
@@ -38,6 +40,14 @@ export async function postRoutes(fastify, options) {
                     .send({ error: "Nenhuma imagem enviada" });
             }
 
+            if(file.bytesRead > MAX_FILE_SIZE){
+                return reply.status(413).send({error: "Arquivo muito grande, tamanho máximo permitido é de 10MB"})
+            }
+
+            const buffer = await file.toBuffer();
+            const webpBuffer = await sharp(buffer).webp({quality: 80}).toBuffer();
+           
+        
             const result = await new Promise((resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
                     { folder: "buddio uploads" },
@@ -46,10 +56,12 @@ export async function postRoutes(fastify, options) {
                             reject(error);
                         } else {
                             resolve(result);
-                        }
+                    }
                     }
                 );
-                file.file.pipe(uploadStream);
+                // file.file.pipe(uploadStream);
+                const readableStream = Readable.from(webpBuffer)
+                readableStream.pipe(uploadStream);
             });
 
             const imageUrl = result.secure_url;
@@ -69,8 +81,9 @@ export async function postRoutes(fastify, options) {
                 url: result.secure_url,
                 newPost: saved,
             });
+
         } catch (error) {
-            console.error("Erro no servidor: ", error);
+            console.error("Erro no servidorrrrr: ", error);
             reply.status(500).send({
                 error: "Erro ao fazer o upload do arquivo: " + error.message,
             });
@@ -86,9 +99,7 @@ export async function postRoutes(fastify, options) {
         }
     });
 
-
-
-    fastify.put(   
+    fastify.put(
         // ESSA ROTA AINDA NÃO ESTÁ SENDO UTILIZADA DENTRO DA APLICAÇÃO, É A QUE VAI FAZER O NÚMERO DE CURTIDAS SE ALTERAR PARA O DONO DO POST
         "/:postId/like",
         { preHandler: [verifyJWT] },

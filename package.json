@@ -26,7 +26,8 @@
     "mongoose": "^8.6.3",
     "nodemailer": "^6.9.16",
     "postgres": "^3.4.4",
-    "socket.io": "^4.8.1"
- 
+    "sharp": "^0.33.5",
+    "socket.io": "^4.8.1",
+    "streamifier": "^0.1.1"
   }
 }
