@@ -2,111 +2,116 @@ import { verifyJWT } from "../middlewares/auth.js";
 import { Follow } from "../models/Follow.js";
 
 export async function followRoutes(fastify, options) {
-    fastify.post(
-        "/follow/:id",
-        { preHandler: [verifyJWT] },
-        async (req, reply) => {
-            try {
+  fastify.post(
+    "/follow/:id",
+    { preHandler: [verifyJWT] },
+    async (req, reply) => {
+      try {
+        const followedId = req.params.id;
+        const followerId = req.user.id;
 
-                const followedId = req.params.id;
-                const followerId = req.user.id;
+        const existingFollow = await Follow.findOne({
+          followerId,
+          followedId,
+        });
 
-                const existingFollow = await Follow.findOne({
-                    followerId,
-                    followedId,
-                }); 
-
-                if (existingFollow) {
-                    return reply
-                        .status(400)
-                        .send({
-                            message: "Você já está seguindo esse usuário.",
-                        });
-                }
-
-                const follow = new Follow({ followerId, followedId });
-                await follow.save();
-
-                return reply.send({ message: "Seguindo usuário.", isFollowing: true });
-            } catch (error) {
-                console.error("Erro ao seguir usuário: ", error);
-            }
+        if (existingFollow) {
+          return reply.status(400).send({
+            message: "Você já está seguindo esse usuário.",
+          });
         }
-    );
 
-    fastify.delete(
-        "/unfollow/:id",
-        { preHandler: [verifyJWT] },
-        async (req, reply) => {
-            try {
-                const followedId  = req.params.id;
-                const followerId = req.user.id;
+        const follow = new Follow({ followerId, followedId });
+        await follow.save();
 
-                const deletedFollow = await Follow.findOneAndDelete({
-                    followerId,
-                    followedId,
-                });
+        return reply.send({ message: "Seguindo usuário.", isFollowing: true });
+      } catch (error) {
+        console.error("Erro ao seguir usuário: ", error);
+      }
+    },
+  );
 
-                if (!deletedFollow) {
-                    return reply
-                        .status(404)
-                        .send({
-                            message: "Você não está seguindo esse usuário.",
-                        });
-                }
+  fastify.delete(
+    "/unfollow/:id",
+    { preHandler: [verifyJWT] },
+    async (req, reply) => {
+      try {
+        const followedId = req.params.id;
+        const followerId = req.user.id;
 
-                return reply.send({ message: "Deixou de seguir o usuário.", isFollowing: false });
-            } catch (error) {
-                console.error("Erro ao deixar de seguir usuário: ", error);
-                return reply.status(500).send({ message: error.message });
-            }
+        const deletedFollow = await Follow.findOneAndDelete({
+          followerId,
+          followedId,
+        });
+
+        if (!deletedFollow) {
+          return reply.status(404).send({
+            message: "Você não está seguindo esse usuário.",
+          });
         }
-    );
 
-    fastify.get(
-        "/followers",
-        { preHandler: [verifyJWT] },
-        async (req, reply) => {
-            try {
-                const  userId  = req.user.id;
+        return reply.send({
+          message: "Deixou de seguir o usuário.",
+          isFollowing: false,
+        });
+      } catch (error) {
+        console.error("Erro ao deixar de seguir usuário: ", error);
+        return reply.status(500).send({ message: error.message });
+      }
+    },
+  );
 
-                const followers = await Follow.find({
-                    followedId: userId,
-                }).populate("followerId", "username profileImage");
-                reply.send(followers.map((follow) => follow.followerId));
-            } catch (error) {
-                console.error("Erro ao buscar seguidores: ", error);
-                reply.status(500).send({ message: error.message });
-            }
-        }
-    );
+  fastify.get("/followers", { preHandler: [verifyJWT] }, async (req, reply) => {
+    try {
+      const userId = req.user.id;
 
-    fastify.get("/isFollowing/:followedId", { preHandler: [verifyJWT] }, async (req, reply) => {
-        try {
-            const followerId = req.user.id
-            const { followedId } = req.params
+      const followers = await Follow.find({
+        followedId: userId,
+      }).populate("followerId", "username profileImage");
+      reply.send(followers.map((follow) => follow.followerId));
+    } catch (error) {
+      console.error("Erro ao buscar seguidores: ", error);
+      reply.status(500).send({ message: error.message });
+    }
+  });
 
-            const isFollowing = await Follow.exists({ followerId, followedId })
+  fastify.get(
+    "/isFollowing/:followedId",
+    { preHandler: [verifyJWT] },
+    async (req, reply) => {
+      try {
+        const followerId = req.user.id;
+        const { followedId } = req.params;
 
-            reply.send({isFollowing: Boolean(isFollowing)})
-        } catch (error) {
-            console.error("Erro ao verificar se está seguindo: ", error)
-            reply.status(500).send({ message: error.message })
-        }
-    })
+        const isFollowing = await Follow.exists({ followerId, followedId });
 
-    fastify.get("/user/following", { preHandler: [verifyJWT] }, async (req, reply) => {
-        try {
-            const followerId = req.user.id
-            const following = await Follow.find({ followerId }).select("followedId")
+        reply.send({ isFollowing: Boolean(isFollowing) });
+      } catch (error) {
+        console.error("Erro ao verificar se está seguindo: ", error);
+        reply.status(500).send({ message: error.message });
+      }
+    },
+  );
 
-            const followedIds = following.map(follow => follow.followedId.toString())
+  fastify.get(
+    "/user/following",
+    { preHandler: [verifyJWT] },
+    async (req, reply) => {
+      try {
+        const followerId = req.user.id;
+        const following = await Follow.find({ followerId }).select(
+          "followedId",
+        );
 
-            reply.send(followedIds)
-        
-        } catch (error) {
-            console.error("Erro ao buscar seguidores: ", error)
-            reply.status(500).send({ message: error.message})
-        }
-    })
+        const followedIds = following.map((follow) =>
+          follow.followedId.toString(),
+        );
+
+        reply.send(followedIds);
+      } catch (error) {
+        console.error("Erro ao buscar seguidores: ", error);
+        reply.status(500).send({ message: error.message });
+      }
+    },
+  );
 }
