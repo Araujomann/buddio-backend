@@ -119,9 +119,10 @@ io.on("connection", (socket) => {
 
 const start = async () => {
   try {
+
     const port = process.env.PORT || 5000;
     await fastify.listen({port, host: '0.0.0.0'});
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${port}`);
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);
