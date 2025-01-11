@@ -28,6 +28,7 @@ export async function postRoutes(fastify, options) {
     }
   });
 
+  
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 5MB
   fastify.post("/upload", { preHandler: [verifyJWT] }, async (req, reply) => {
     try {

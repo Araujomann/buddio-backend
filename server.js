@@ -1,5 +1,7 @@
 import Fastify from "fastify";
-import cors from "@fastify/cors";
+import cors  from "@fastify/cors";
+import fastifyCors from "@fastify/cors";
+
 import { Server } from "socket.io";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
@@ -14,13 +16,27 @@ import { searchRoutes } from "./routes/searchRoutes.js";
 import { followRoutes } from "./routes/followRoutes.js";
 import { conversationRoutes } from "./routes/conversationRoutes.js";
 import fastifyMultipart from "@fastify/multipart";
+import fastifyCors from "@fastify/cors";
 
 const fastify = Fastify({ logger: true });
 
 dotenv.config();
 
+
+
+fastify.addHook('onSend', (request, reply, payload, done) => {
+  reply.header('Cross-Origin-Opener-Policy', 'same-origin');
+  reply.header('Cross-Origin-Embedder-Policy', 'require-corp');
+  done();
+});
+
+fastify.register(fastifyCors, {
+  origin: "https://buddio.vercel.app",
+  credentials: true,
+})
+
 fastify.register(cors, {
-  origin: "*",
+  origin: "https://buddio.vercel.app",
 });
 
 connectDB();
