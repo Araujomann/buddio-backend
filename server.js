@@ -20,8 +20,8 @@ const fastify = Fastify({ logger: true });
 dotenv.config();
 
 fastify.addHook("onSend", (request, reply, payload, done) => {
-    // reply.header("Cross-Origin-Opener-Policy", "same-origin");
-    // reply.header("Cross-Origin-Embedder-Policy", "require-corp");
+    reply.header("Cross-Origin-Opener-Policy", "same-origin");
+    reply.header("Cross-Origin-Embedder-Policy", "require-corp");
     done();
 });
 
