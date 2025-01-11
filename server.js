@@ -1,5 +1,4 @@
 import Fastify from "fastify";
-import cors from "@fastify/cors";
 import fastifyCors from "@fastify/cors";
 import { Server } from "socket.io";
 import dotenv from "dotenv";
@@ -31,9 +30,6 @@ fastify.register(fastifyCors, {
     credentials: true,
 });
 
-fastify.register(cors, {
-    origin: "https://buddio.vercel.app",
-});
 
 connectDB();
 
