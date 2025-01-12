@@ -32,7 +32,7 @@ export async function followRoutes(fastify, options) {
   );
 
   fastify.delete(
-    "/unfollow/:id",
+    "/follow/:id",
     { preHandler: [verifyJWT] },
     async (req, reply) => {
       try {
