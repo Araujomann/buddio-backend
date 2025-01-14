@@ -26,7 +26,7 @@ fastify.addHook("onSend", (request, reply, payload, done) => {
 });
 
 fastify.register(fastifyCors, {
-    origin: ["https://buddio.vercel.app", "http://localhost:3000"],
+    origin: ["https://buddio.vercel.app", "http://localhost:5173"],
     credentials: true,
 });
 
@@ -51,7 +51,12 @@ fastify.register(conversationRoutes, { prefix: "/conversations" });
 const server = fastify.server;
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:3000",
+        origin: [
+            process.env.FRONTEND_URL,
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5000 ",
+        ],
         methods: ["GET", "POST"],
     },
     transports: ["websocket"],
@@ -69,7 +74,7 @@ io.use((socket, next) => {
         socket.user = payload;
         next();
     } catch (error) {
-        console.error("Erro na autenticação do WebSocket:", error.message);
+        console.error("Erro na autenticação do WebSocket: ", error.message);
         next(new Error("Token inválido"));
     }
 });
@@ -80,9 +85,33 @@ io.on("connection", (socket) => {
     socket.on("joinConversation", async (conversationId) => {
         try {
             socket.join(conversationId);
-            console.log(
-                `Usuário ${socket.user.id} entrou na conversa: ${conversationId}`
-            );
+
+            const rooms = io.sockets.adapter.rooms;
+
+            const onlineSockets = rooms.get(conversationId);
+
+            if (onlineSockets) {
+                const onlineUsers = [...onlineSockets].map((socketId) => {
+                    const userSocket = io.sockets.sockets.get(socketId);
+                    return userSocket.user.id;
+                });
+
+                socket.broadcast.emit("updateOnlineStatus", {
+                    userId: socket.user.id,
+                    status: "online",
+                });
+
+                console.log(
+                    "lista de usuários online sendo enviada: ",
+                    onlineUsers
+                );
+                socket.emit("currentOnlineUsers", onlineUsers);
+            } else {
+                console.log(
+                    `Nenhuma sala encontrada para ID ${conversationId}`
+                );
+                socket.emit("currentOnlineUsers", []);
+            }
 
             const messages = await Message.find({ conversationId }).sort({
                 timestamp: 1,
@@ -122,6 +151,10 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log("Usuário desconectado:", socket.id);
+        socket.broadcast.emit("updateOnlineStatus", {
+            userId: socket.user.id,
+            status: "offline",
+        });
     });
 });
 

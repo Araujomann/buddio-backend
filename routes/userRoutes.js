@@ -3,6 +3,8 @@ import { verifyJWT } from "../middlewares/auth.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
+dotenv.config();
+
 export async function userRoutes(fastify, options) {
   fastify.post("/register", async (req, reply) => {
     const { username, email, password, authProvider } = req.body;
@@ -46,6 +48,7 @@ export async function userRoutes(fastify, options) {
       });
 
       if (authProvider !== "google") {
+
         const mailOptions = {
           from: process.env.EMAIL_OWNER,
           to: email,
@@ -54,7 +57,7 @@ export async function userRoutes(fastify, options) {
                         <div style="text-align: center;">
                     <h1 style="font-size: 32px; color: #333;">Confirmação de Cadastro</h1>
                     <p style="font-size: 24px; color: #555;">Olá ${username}, por favor, confirme seu cadastro clicando no link. </p>
-                    <p style="font-size: 20px; color: #555;">https://buddio-backend-production.up.railway.app/user/confirm-email/${confirmationCode}</p>
+                    <p style="font-size: 20px; color: #555;">${process.env.DEVELOPMENT_DOMAIN}/user/confirm-email/${confirmationCode}</p>
                    </div>
                     `,
         };
