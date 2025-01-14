@@ -1,5 +1,6 @@
 import { User } from "../models/User.js";
 import { verifyJWT } from "../middlewares/auth.js";
+import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 
