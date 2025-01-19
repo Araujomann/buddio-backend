@@ -30,7 +30,6 @@ fastify.register(fastifyCors, {
     credentials: true,
 });
 
-
 connectDB();
 
 fastify.register(fastifyMultipart, {
@@ -87,7 +86,6 @@ io.on("connection", (socket) => {
             socket.join(conversationId);
 
             const rooms = io.sockets.adapter.rooms;
-
             const onlineSockets = rooms.get(conversationId);
 
             if (onlineSockets) {
@@ -96,21 +94,21 @@ io.on("connection", (socket) => {
                     return userSocket.user.id;
                 });
 
-                socket.broadcast.emit("updateOnlineStatus", {
-                    userId: socket.user.id,
-                    status: "online",
-                });
-
-                console.log(
-                    "lista de usuários online sendo enviada: ",
-                    onlineUsers
-                );
                 socket.emit("currentOnlineUsers", onlineUsers);
+
+                if (onlineUsers.length === 2) {
+                    onlineUsers.forEach((userId) => {
+                        io.to(conversationId).emit("updateOnlineStatus", {
+                            userId: userId,
+                            status: "online",
+                        });
+                    });
+                }
+                
             } else {
                 console.log(
                     `Nenhuma sala encontrada para ID ${conversationId}`
                 );
-                socket.emit("currentOnlineUsers", []);
             }
 
             const messages = await Message.find({ conversationId }).sort({
