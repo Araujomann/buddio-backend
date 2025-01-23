@@ -54,7 +54,7 @@ const io = new Server(server, {
             process.env.FRONTEND_URL,
             "http://localhost:5173",
             "http://localhost:5174",
-            "http://localhost:5000 ",
+            "http://localhost:5000",
         ],
         methods: ["GET", "POST"],
     },
