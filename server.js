@@ -51,7 +51,7 @@ const server = fastify.server;
 const io = new Server(server, {
     cors: {
         origin: [
-            process.env.FRONTEND_URL,
+            "https://buddio.vercel.app",
             "http://localhost:5173",
             "http://localhost:5174",
             "http://localhost:5000",
@@ -168,3 +168,18 @@ const start = async () => {
 };
 
 start();
+
+process.on("SIGNIT", async () => {
+    console.log("Encerrando aplicação...")
+
+    try {
+        await mongoose.connection.close();
+        console.log("Conexão com o mongoDB encerrada!");
+        await fastify.close();
+        console.log("Servidor encerrado!");
+    } catch (error) {
+        console.log("Erro ao encerrar aplicação:", error.message);
+    }
+
+    process.exit(0);
+})
