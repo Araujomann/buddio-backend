@@ -1,6 +1,7 @@
 import { verifyJWT } from "../middlewares/auth.js";
 import { Conversation } from "../models/Conversation.js";
-
+import { Follow } from "../models/Follow.js";
+import { User } from "../models/User.js";
 import { Message } from "../models/Message.js";
 
 export async function conversationRoutes(fastify, options) {
@@ -20,6 +21,45 @@ export async function conversationRoutes(fastify, options) {
       console.log(error.message);
     }
   });
+
+  fastify.get("/start-chat/:query", { preHandler: [verifyJWT] }, async (req, reply) => {
+
+    const userId = req.user.id
+    const { query } = req.params
+
+    try {
+      const follows = await Follow.find({ followerId: userId})
+      // .populate({
+      //   path: 'followedId',
+      //   model: 'User',
+      //   select: 'username profileImage',
+      //   match: {
+      //     username: { $regex: query, $options: 'i'}
+      //   }
+      // })
+
+
+      // const matchedUsers = follows
+      // .filter(follow => follow.followedId !== null)
+      // .map(follow => follow.followedId)
+
+
+      // return reply.send(matchedUsers)
+
+      const followedsIds = follows.map(follow => follow.followedId)
+
+      const matchedUsers = await User.find({
+        _id: { $in: followedsIds},
+        username: {$regex: query, $options: 'i'}
+      }).select('username profileImage')
+
+      reply.send(matchedUsers)
+      
+    } catch (error) {
+      reply.code(500).send({ error: error.message });
+      console.log(error.message);
+    }
+  })
 
   fastify.post(
     "/:receiverId",
@@ -69,58 +109,6 @@ export async function conversationRoutes(fastify, options) {
       reply.code(500).send({ error: error.message });
     }
   });
-
-  // // fastify.post("/messages", async (req, reply) => {
-  // //     const { conversationId, senderId, message } = req.body;
-
-  // //     try {
-  // //         const newMessage = new Message({
-  // //             conversationId,
-  // //             senderId,
-  // //             message,
-  // //             timestamp: Date.now(),
-  // //         });
-  // //         await newMessage.save();
-
-  // //         const conversation = await Conversation.findById(conversationId);
-  // //         if (!conversation) {
-  // //             return reply
-  // //                 .code(404)
-  // //                 .send({ error: "Conversation not found" });
-  // //         }
-
-  // //         conversation.lastMessage = {
-  // //             text: message,
-  // //             timestamp: newMessage.timestamp,
-  // //         }
-
-  // //         if (!conversation.startedAt) {
-  // //             conversation.startedAt = Date.now();
-  // //         }
-
-  // //         await conversation.save();
-
-  // //         const participants = conversation.participants;
-
-  // //         participants.forEach((participantId) => {
-  // //             const clientSocket = clients.get(participantId);
-  // //             if (clientSocket) {
-  // //                 clientSocket.send(
-  // //                     JSON.stringify({
-  // //                         conversationId,
-  // //                         senderId,
-  // //                         message: newMessage.message,
-  // //                     })
-  // //                 );
-  // //             }
-  // //         });
-
-  // //         reply.send({ messageId: newMessage._id });
-  // //     } catch (error) {
-  // //         reply.code(500).send({ error: error.message });
-  // //         console.log(error.message);
-  // //     }
-  // // });
 
   fastify.get("/messages/:conversationId", async (req, reply) => {
     const { conversationId } = req.params;
