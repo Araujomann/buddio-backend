@@ -6,7 +6,7 @@ dotenv.config();
 export const connectDB = async () => {
     try {
         // conexão com opções adicionais de estabilidade
-        await mongoose.connect(process.env.MONGO_URL, {
+        await mongoose.connect(process.env.DATABASE_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             maxPoolSize: 10,
