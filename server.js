@@ -123,16 +123,13 @@ io.on("connection", (socket) => {
     socket.on(
         "sendMessage",
         async ({ conversationId, senderId, message, timestamp }) => {
-            const time = new Date(timestamp).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-            });
+          
             try {
                 const newMessage = new Message({
                     conversationId,
                     senderId,
                     message,
-                    time,
+                    timestamp,
                 });
                 await newMessage.save();
 
@@ -140,6 +137,7 @@ io.on("connection", (socket) => {
                     conversationId,
                     senderId,
                     message: newMessage.message,
+                    timestamp: newMessage.timestamp,
                 });
             } catch (error) {
                 console.error("Erro ao enviar mensagem:", error);
