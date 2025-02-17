@@ -161,7 +161,7 @@ export async function userRoutes(fastify, options) {
 
             await user.save();
 
-            reply.redirect("http://localhost:5173/login?verified=true");
+            reply.redirect("https://buddio.vercel.app/login?verified=true");
         } catch (error) {
             reply.code(500).send({ error: "Erro ao confirmar o email" });
             console.error("Erro no servidor: ", error.message);
