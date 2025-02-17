@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { Message } from "./models/Message.js";
-import { connectDB } from "./db.js";
+import { connectDB, disconnectDB } from "./db.js";
 import { postRoutes } from "./routes/postRoutes.js";
 import { userRoutes } from "./routes/userRoutes.js";
 import { authRoutes } from "./routes/authRoutes.js";
@@ -171,12 +171,13 @@ process.on("SIGNIT", async () => {
     console.log("Encerrando aplicação...")
 
     try {
-        await mongoose.connection.close();
+        await disconnectDB();
         console.log("Conexão com o mongoDB encerrada!");
         await fastify.close();
         console.log("Servidor encerrado!");
     } catch (error) {
         console.log("Erro ao encerrar aplicação:", error.message);
+        process.exit(1)
     }
 
     process.exit(0);
