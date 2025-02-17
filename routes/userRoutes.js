@@ -59,7 +59,7 @@ export async function userRoutes(fastify, options) {
           <div style="text-align: center; font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 40px; border-radius: 10px;">
             <h1 style="font-size: 32px; color: #333; margin-bottom: 10px;">Confirmação de Cadastro</h1>
             <p style="font-size: 18px; color: #555; margin-bottom: 20px;">Olá <strong>${username}</strong>, por favor, confirme seu cadastro clicando no botão abaixo:</p>
-            <a href="http://localhost:5000/user/confirm-email/${confirmationCode}" 
+            <a href="https://buddio-backend.onrender.com/user/confirm-email/${confirmationCode}" 
                style="display: inline-block; padding: 12px 24px; font-size: 16px; color: #fff; background-color: #0B6353; 
                text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s ease;">
                Confirmar E-mail
