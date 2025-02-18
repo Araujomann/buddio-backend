@@ -144,7 +144,7 @@ export async function followRoutes(fastify, options) {
 
                 reply.send(followedIds);
             } catch (error) {
-                console.error("Erro ao buscar seguidores: ", error);
+                console.error("Erro ao buscar usuários seguidos: ", error);
                 reply.status(500).send({ message: error.message });
             }
         }
