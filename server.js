@@ -133,6 +133,8 @@ io.on("connection", (socket) => {
                 });
                 await newMessage.save();
 
+                io.to(message.conversationId).emit("newMessage", newMessage);
+
                 io.to(conversationId).emit("receiveMessage", {
                     conversationId,
                     senderId,

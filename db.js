@@ -19,6 +19,7 @@ const connectDB = async () => {
 const disconnectDB = async () => {
     try {
         await mongoose.connection.close()
+        
         console.log("Conexão com o mongoDB encerrada!");
 
     } catch (error) {
