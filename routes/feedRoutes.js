@@ -11,6 +11,8 @@ export async function feedRoutes(fastify, options) {
                 "followedId"
             );
 
+            following.push({ followedId: userId });
+
             const followedIds = following.map((follow) =>
                 follow.followedId.toString()
             );
