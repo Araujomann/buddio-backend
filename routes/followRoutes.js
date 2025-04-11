@@ -108,6 +108,23 @@ export async function followRoutes(fastify, options) {
     );
 
     fastify.get(
+        "/following",
+        { preHandler: [verifyJWT] },
+        async (req, reply) => {
+            try {
+                const userId = req.user.id;
+                const following = await Follow.find({
+                    followerId: userId,
+                }).populate("followedId", "username profileImage");
+                reply.send(following.map((follow) => follow.followedId));
+            } catch (error) {
+                console.error("Erro ao buscar usuários seguidos: ", error);
+                reply.status(500).send({ message: error.message });
+            }
+        }
+    );
+
+    fastify.get(
         "/isFollowing/:followedId",
         { preHandler: [verifyJWT] },
         async (req, reply) => {
