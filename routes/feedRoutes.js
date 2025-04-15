@@ -5,6 +5,7 @@ import { Follow } from "../models/Follow.js";
 export async function feedRoutes(fastify, options) {
     fastify.get("/posts", { preHandler: [verifyJWT] }, async (req, reply) => {
         const userId = req.user.id;
+        const { page = 1, limit = 10 } = req.query;
 
         try {
             const following = await Follow.find({ followerId: userId }).select(
@@ -19,14 +20,29 @@ export async function feedRoutes(fastify, options) {
 
             const posts = await Post.find({ user: { $in: followedIds } })
                 .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit)
                 .populate("user", "username");
+
+            const totalPosts = await Post.countDocuments({
+                user: { $in: followedIds },
+            });
+            const totalPages = Math.ceil(totalPosts / limit);
 
             const postsWithLikesStatus = posts.map((post) => ({
                 ...post.toObject(),
                 isLiked: post.likes.includes(userId),
             }));
 
-            return reply.send(postsWithLikesStatus);
+            return reply.send({
+                posts: postsWithLikesStatus,
+                pagination: {
+                    totalPosts,
+                    totalPages,
+                    currentPage: Number(page),
+                    hasNextPage: Number(page) < totalPages,
+                },
+            });
         } catch (error) {
             console.log(error);
             reply.code(500).send({ error: error.message });
