@@ -52,6 +52,7 @@ const io = new Server(server, {
     cors: {
         origin: [
             "https://buddio.vercel.app",
+            "http://localhost:4173",
             "http://localhost:5173",
             "http://localhost:5174",
             "http://localhost:5000",
