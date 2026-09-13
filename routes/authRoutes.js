@@ -2,13 +2,17 @@ import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import admin from "firebase-admin";
+import { getApp, getApps, initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import crypto from "crypto";
 import { fileURLToPath } from 'url';
 
-admin.initializeApp({
+const firebaseApp = getApps().length
+  ? getApp()
+  : initializeApp({
   projectId: "buddio2"
-});
+  });
+const firebaseAuth = getAuth(firebaseApp);
 
 export async function authRoutes(fastify, options) {
   dotenv.config();
@@ -22,7 +26,7 @@ export async function authRoutes(fastify, options) {
 
       let decodedToken;
       try {
-         decodedToken = await admin.auth().verifyIdToken(idToken);
+         decodedToken = await firebaseAuth.verifyIdToken(idToken);
       } catch (err) {
          console.error("Erro ao verificar token do firebase:", err);
          return reply.code(401).send({ error: "Token inválido ou expirado" });

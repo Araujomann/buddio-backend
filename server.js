@@ -26,7 +26,10 @@ fastify.addHook("onSend", (request, reply, payload, done) => {
 });
 
 fastify.register(fastifyCors, {
-    origin: ["https://buddio.vercel.app", "http://localhost:5173"],
+    origin: (process.env.FRONTEND_URLS || "https://buddio.vercel.app,http://localhost:5173,http://127.0.0.1:5173")
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean),
     credentials: true,
 });
 
@@ -54,6 +57,7 @@ const io = new Server(server, {
             "https://buddio.vercel.app",
             "http://localhost:4173",
             "http://localhost:5173",
+            "http://127.0.0.1:5173",
             "http://localhost:5174",
             "http://localhost:5000",
         ],
