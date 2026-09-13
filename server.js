@@ -26,7 +26,10 @@ fastify.addHook("onSend", (request, reply, payload, done) => {
 });
 
 fastify.register(fastifyCors, {
-    origin: (process.env.FRONTEND_URLS || "https://buddio.vercel.app,http://localhost:5173,http://127.0.0.1:5173")
+    origin: (
+        process.env.FRONTEND_URLS ||
+        "https://buddio.vercel.app,http://localhost:5173,http://127.0.0.1:5173"
+    )
         .split(",")
         .map((origin) => origin.trim())
         .filter(Boolean),
@@ -109,10 +112,9 @@ io.on("connection", (socket) => {
                         });
                     });
                 }
-                
             } else {
                 console.log(
-                    `Nenhuma sala encontrada para ID ${conversationId}`
+                    `Nenhuma sala encontrada para ID ${conversationId}`,
                 );
             }
 
@@ -128,7 +130,6 @@ io.on("connection", (socket) => {
     socket.on(
         "sendMessage",
         async ({ conversationId, senderId, message, timestamp }) => {
-          
             try {
                 const newMessage = new Message({
                     conversationId,
@@ -149,7 +150,7 @@ io.on("connection", (socket) => {
             } catch (error) {
                 console.error("Erro ao enviar mensagem:", error);
             }
-        }
+        },
     );
 
     socket.on("disconnect", () => {
@@ -175,7 +176,7 @@ const start = async () => {
 start();
 
 process.on("SIGNIT", async () => {
-    console.log("Encerrando aplicação...")
+    console.log("Encerrando aplicação...");
 
     try {
         await disconnectDB();
@@ -184,8 +185,8 @@ process.on("SIGNIT", async () => {
         console.log("Servidor encerrado!");
     } catch (error) {
         console.log("Erro ao encerrar aplicação:", error.message);
-        process.exit(1)
+        process.exit(1);
     }
 
     process.exit(0);
-})
+});
