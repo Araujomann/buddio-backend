@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
     confirmationCode: {
       type: String,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
     password: {
       type: String,
       required: function () {
